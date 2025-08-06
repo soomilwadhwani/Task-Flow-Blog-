@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow Blog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <header class="text-center py-8 bg-white shadow-md">
+    <h1 class="text-4xl font-extrabold text-blue-700">TaskFlow Blog</h1>
+    <p class="text-gray-600 text-lg mt-2">Tips, Travel, Food & Podcasts from Our Community</p>
+  </header>
+
+  <section class="max-w-5xl mx-auto px-4 mt-8">
+    <input
+      id="searchInput"
+      type="text"
+      placeholder="Search blog posts..."
+      class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-6"
+    />
+
+    <div class="flex flex-wrap gap-3 mb-8 justify-center" id="categoryFilter">
+      <button class="filter-btn px-4 py-2 bg-blue-600 text-white rounded-full font-medium" data-category="All">All</button>
+      <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full" data-category="Tech">Tech</button>
+      <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full" data-category="Travel">Travel</button>
+      <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full" data-category="Food">Food</button>
+      <button class="filter-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-full" data-category="Podcast">Podcast</button>
+    </div>
+  </section>
+
+  <section class="max-w-6xl mx-auto px-4 grid gap-8 sm:grid-cols-2 lg:grid-cols-3" id="blogContainer"></section>
+
+  <div class="flex justify-center gap-2 mt-10 mb-10" id="paginationContainer"></div>
+
+  <script>
+    const posts = [
+      {
+        id: 1,
+        title: "Exploring React 18 Features",
+        category: "Tech",
+        description: "An overview of new features in React 18.",
+        date: "2025-07-01",
+        image: "https://cdn.prod.website-files.com/669eb1086f08fffc3efda56e/66b4d2a12c6d076f3ab65e86_React_18_c041dfbeb6.png"
+      },
+      {
+        id: 2,
+        title: "Backpacking through the Alps",
+        category: "Travel",
+        description: "A scenic journey through the Swiss Alps.",
+        date: "2025-06-20",
+        image: "https://images.unsplash.com/photo-1508264165352-258db2ebd59b?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 3,
+        title: "Top 5 JavaScript Tips",
+        category: "Tech",
+        description: "Quick wins to boost your JS skills.",
+        date: "2025-06-15",
+        image: "https://i.ytimg.com/vi/Y5sVOV5GQJs/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDGWWMU3Mo_uPpJRDE-n4rmnhETmA"
+      },
+      {
+        id: 4,
+        title: "Vegan Pasta Recipe",
+        category: "Food",
+        description: "A healthy and tasty vegan pasta.",
+        date: "2025-05-30",
+        image: "https://schoolnightvegan.com/wp-content/uploads/2021/01/easy-creamy-vegan-pasta-32.jpg"
+      },
+      {
+        id: 5,
+        title: "Why You Should Travel Solo",
+        category: "Travel",
+        description: "Discover the joy of solo travel.",
+        date: "2025-05-10",
+        image: "https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 6,
+        title: "Mastering Tailwind CSS",
+        category: "Tech",
+        description: "Responsive UI with utility-first CSS.",
+        date: "2025-07-10",
+        image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=800&q=80"
+      },
+      {
+        id: 7,
+        title: "Top Productivity Podcasts to Follow",
+        category: "Podcast",
+        description: "Our handpicked list of motivational and productivity podcasts.",
+        date: "2025-07-20",
+        image: "https://i.ytimg.com/vi/0q6JO4vVimQ/maxresdefault.jpg"
+      },
+      {
+        id: 8,
+        title: "Podcasting 101: Getting Started",
+        category: "Podcast",
+        description: "Learn how to create, publish, and grow your own podcast.",
+        date: "2025-06-12",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKKcSlTEQ_RJwlcYCz04BKMsot-5QkUi9JVw&s"
+      }
+    ];
+
+    const postsPerPage = 3;
+    let currentPage = 1;
+    let currentCategory = "All";
+    let searchKeyword = "";
+
+    const blogContainer = document.getElementById("blogContainer");
+    const paginationContainer = document.getElementById("paginationContainer");
+
+    function renderPosts() {
+      const filtered = posts.filter(post => {
+        const matchesSearch = post.title.toLowerCase().includes(searchKeyword.toLowerCase());
+        const matchesCategory = currentCategory === "All" || post.category === currentCategory;
+        return matchesSearch && matchesCategory;
+      });
+
+      const totalPages = Math.ceil(filtered.length / postsPerPage);
+      const start = (currentPage - 1) * postsPerPage;
+      const visible = filtered.slice(start, start + postsPerPage);
+
+      blogContainer.innerHTML = visible.length
+        ? visible.map(post => `
+          <div class="bg-white rounded-xl overflow-hidden shadow hover:shadow-xl transition duration-300">
+            <img src="${post.image}" class="w-full h-48 object-cover" />
+            <div class="p-5">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-medium">${post.category}</span>
+                <span class="text-sm text-gray-500">${post.date}</span>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900">${post.title}</h3>
+              <p class="mt-2 text-gray-600">${post.description}</p>
+            </div>
+          </div>
+        `).join('')
+        : `<p class="col-span-3 text-center text-gray-500">No posts found.</p>`;
+
+      paginationContainer.innerHTML = Array.from({ length: totalPages }, (_, i) => `
+        <button class="px-4 py-2 rounded-full ${currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-800'}"
+          onclick="goToPage(${i + 1})">${i + 1}</button>
+      `).join('');
+    }
+
+    function goToPage(page) {
+      currentPage = page;
+      renderPosts();
+    }
+
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      searchKeyword = e.target.value;
+      currentPage = 1;
+      renderPosts();
+    });
+
+    document.querySelectorAll(".filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        currentCategory = btn.dataset.category;
+        currentPage = 1;
+
+        document.querySelectorAll(".filter-btn").forEach(b => {
+          b.classList.remove("bg-blue-600", "text-white");
+          b.classList.add("bg-gray-200", "text-gray-700");
+        });
+
+        btn.classList.add("bg-blue-600", "text-white");
+        btn.classList.remove("bg-gray-200", "text-gray-700");
+
+        renderPosts();
+      });
+    });
+
+    renderPosts();
+  </script>
+</body>
+</html>
